@@ -1,40 +1,40 @@
 import streamlit as st
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import torch
+
 @st.cache_resource
-def load_model():
-    model_name = "EleutherAI/gpt-neo-125M"
-    tokenizer = AutoTokenizer.from_pretrained(model_name)
-    model = AutoModelForCausalLM.from_pretrained(model_name)  # No torch_dtype or device_map
+def initialize_model():
+    model_id = "EleutherAI/gpt-neo-125M"
+    tokenizer = AutoTokenizer.from_pretrained(model_id)
+    model = AutoModelForCausalLM.from_pretrained(model_id)
     return tokenizer, model
 
-def generate_explanation(code_snippet: str, tokenizer, model) -> str:
+def explain_python_code(code: str, tokenizer, model) -> str:
     prompt = (
-        "You are a helpful programming assistant. "
-        "Explain what the following Python code does in plain English:\n\n"
-        f"{code_snippet}\n\nExplanation:"
+        "You are an expert Python tutor. Please explain the following code clearly and simply:\n\n"
+        f"{code}\n\nExplanation:"
     )
     inputs = tokenizer(prompt, return_tensors="pt").to(model.device)
     outputs = model.generate(
         **inputs,
         max_new_tokens=200,
         do_sample=True,
-        top_p=0.9,
-        temperature=0.7,
+        top_p=0.95,
+        temperature=0.6,
     )
-    text = tokenizer.decode(outputs[0][inputs["input_ids"].shape[-1]:], skip_special_tokens=True)
-    return text.strip()
+    explanation = tokenizer.decode(outputs[0][inputs["input_ids"].shape[-1]:], skip_special_tokens=True)
+    return explanation.strip()
 
-def main():
-    st.title("🔍 Local AI Code Explainer")
-    tokenizer, model = load_model()
+def launch_app():
+    st.title("🧠 CodeComprehend: Python Code Explainer")
+    tokenizer, model = initialize_model()
 
-    code_input = st.text_area("Enter your Python code here:", height=200)
-    if st.button("Explain Code") and code_input.strip():
-        with st.spinner("Generating explanation…"):
-            explanation = generate_explanation(code_input, tokenizer, model)
-        st.markdown("### 💡 Explanation")
-        st.write(explanation)
+    user_input = st.text_area("✏️ Enter Python code below:", height=200)
+    if st.button("Explain Code") and user_input.strip():
+        with st.spinner("Generating smart explanation..."):
+            result = explain_python_code(user_input, tokenizer, model)
+        st.markdown("### 📘 Explanation")
+        st.write(result)
 
 if __name__ == "__main__":
-    main()
+    launch_app()
