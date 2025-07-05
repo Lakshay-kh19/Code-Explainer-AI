@@ -19,8 +19,7 @@ CodeComprehend is a lightweight, offline tool that helps Python beginners unders
 
 1. Clone the repo:
 ```bash
-git clone https://github.com/yourusername/CodeComprehend.git
-cd CodeComprehend
-pip install -r requirements.txt
+git clone https://github.com/Lakshay-kh19/Code-Explainer-AI.git
+cd Code-Explainer-AI
 pip install -r requirements.txt
 streamlit run main.py
